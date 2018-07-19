@@ -1,0 +1,32 @@
+﻿<Window x:Class="TestTaskWpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestTaskWpfApp"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="700">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Canvas Grid.Row="0">
+            <Button x:Name="GetCercificate" Content="Проверить сертификат" Height="30" Width="200" Canvas.Top="20" Canvas.Left="40" Click="GetCercificate_Click"/>
+            <Button x:Name="GetErrorCodes" Content="Список ошибок" Height="30" Width="200" Canvas.Top="55" Canvas.Left="40" Click="GetErrorCodes_Click"/>
+            <Button x:Name="GetCategories" Content="Список категорий" Height="30" Width="200" Canvas.Top="90" Canvas.Left="40" Click="GetCategories_Click"/>
+            <TextBlock x:Name="_textBlock" Text="Перед тем как запросить список нужно проверить сертификат"
+                       Canvas.Top="20"
+                       Canvas.Left="300"
+                       Height="100"
+                       Width="250"
+                       TextWrapping="Wrap"/>
+        </Canvas>
+
+        <ScrollViewer Grid.Row="1">
+            <RichTextBox x:Name="_richTextBox"/>
+        </ScrollViewer>
+                      
+
+    </Grid>
+</Window>
