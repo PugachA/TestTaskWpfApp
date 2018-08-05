@@ -14,6 +14,7 @@ namespace TestTaskWpfApp
         public string[] parametersStoredProcedure;
         public string TableType;
         public string name;
+        public string TableName;
         public string TableTypeValues;
 
         public void ErrorCodesValues()
@@ -25,6 +26,7 @@ namespace TestTaskWpfApp
 
             sqlStoredProcedure = "sp_AddErrorCodes";
             TableType = "ErrorCodeTableType";
+            TableName = "ErrorCode";
             TableTypeValues = "code, [text]";
             parametersStoredProcedure = new string[2];
             parametersStoredProcedure[0] = "@code";
@@ -42,6 +44,7 @@ namespace TestTaskWpfApp
 
             sqlStoredProcedure = "sp_AddCategories";
             TableType = "CategoryTableType";
+            TableName = "Category";
             TableTypeValues = "id, [name], parent, [image]";
             parametersStoredProcedure = new string[4];
             parametersStoredProcedure[0] = "@id";

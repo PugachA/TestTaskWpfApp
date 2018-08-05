@@ -1,7 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TestTaskWpfApp.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="CertSerialNumber" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">490000071cca86ffb77b3d794700020000071c</Value>
+    </Setting>
+    <Setting Name="ErrorCodesUri" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://mkassa.byro.ru/payment2/?CmdId=get_errorscode</Value>
+    </Setting>
+    <Setting Name="CategoriesUri" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://mkassa.byro.ru/payment2/?CmdId=GET_CATEGORIES</Value>
+    </Setting>
+    <Setting Name="SqlServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SQLEXPRESS</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

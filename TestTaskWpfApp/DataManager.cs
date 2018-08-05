@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Xml;
 using NLog;
 
@@ -15,44 +18,66 @@ namespace TestTaskWpfApp
     class DataManager
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        public string result;
+        public SolidColorBrush resultColor;
 
         #region Certificate
-        public X509Certificate2 GetCertificate(string serialNumber)
+        public X509Certificate2 GetCertificate(string serialNumber) //получение сертификата
         {
-            X509Certificate2 certificate = null;
-
-            // Открываем хранилище сертификатов
-            using (X509Store store = new X509Store("My", StoreLocation.LocalMachine))
+            try
             {
-                logger.Info("Открываем хранилище сертификатов");
-                store.Open(OpenFlags.ReadOnly);
-                // Находим нужный сертификат
-                X509Certificate2Collection Results = store.Certificates.Find(X509FindType.FindBySerialNumber, serialNumber, false); // ищем по серийному номеру
-                if (Results.Count == 0)
+                X509Certificate2 certificate = null;
+
+                // Открываем хранилище сертификатов
+                using (X509Store store = new X509Store("My", StoreLocation.CurrentUser))
                 {
-                    throw new Exception("Сертификат не найден");
+                    logger.Info("Открываем хранилище сертификатов");
+                    store.Open(OpenFlags.ReadOnly);
+                    // Находим нужный сертификат
+                    X509Certificate2Collection Results = store.Certificates.Find(X509FindType.FindBySerialNumber, serialNumber, false); // ищем по серийному номеру
+                    if (Results.Count == 0)
+                    {
+                        throw new Exception("Сертификат не найден");
+                    }
+                    certificate = Results[0];
                 }
-                certificate = Results[0];
+
+                //вывод информации
+                result = "GetCertificate: Сертификат успешно найден";
+                logger.Info(result);
+                resultColor = Brushes.Green;
+
+                return certificate;
             }
-            logger.Info($"Сертификат c номером {serialNumber} успешно найден");
-   
-            return certificate;
+            catch(Exception ex)
+            {
+                result = $"GetCertificate: {ex.Message}";
+                logger.Error(result);
+                resultColor = Brushes.Red;
+                return null;
+            }
         }
 
-        public string GetCertificateInfo(X509Certificate2 certificate)
+        public string GetCertificateInfo(X509Certificate2 certificate) //метод для получения информации о найденном сертификате
         {
-            byte[] rawdata = certificate.RawData;
-            string Info = "";
-            Info = String.Concat(Info, "Информация о найденном сертификате:\n");
-            Info = String.Concat(Info, $"Content Type: {X509Certificate2.GetCertContentType(rawdata)}\n");
-            Info = String.Concat(Info, $"Friendly Name: {certificate.FriendlyName}\n");
-            Info = String.Concat(Info, $"Simple Name: {certificate.GetNameInfo(X509NameType.SimpleName, true)}\n");
-            Info = String.Concat(Info, $"Signature Algorithm: {certificate.SignatureAlgorithm.FriendlyName}\n");
-            Info = String.Concat(Info, $"Serial Number: {certificate.SerialNumber}\n");
-            Info = String.Concat(Info, $"Thumbprint: {certificate.Thumbprint}\n");
+            if (certificate != null)
+            {
+                byte[] rawdata = certificate.RawData;
+                string Info = "";
 
-            return Info;
-            //logger.Info(Info);
+                Info = String.Concat(Info, "Информация о найденном сертификате:\n");
+                Info = String.Concat(Info, $"Content Type: {X509Certificate2.GetCertContentType(rawdata)}\n");
+                Info = String.Concat(Info, $"Friendly Name: {certificate.FriendlyName}\n");
+                Info = String.Concat(Info, $"Simple Name: {certificate.GetNameInfo(X509NameType.SimpleName, true)}\n");
+                Info = String.Concat(Info, $"Signature Algorithm: {certificate.SignatureAlgorithm.FriendlyName}\n");
+                Info = String.Concat(Info, $"Serial Number: {certificate.SerialNumber}\n");
+                Info = String.Concat(Info, $"Thumbprint: {certificate.Thumbprint}\n");
+
+                logger.Info(Info);
+                return Info;
+                
+            }
+            else return null;
         }
         #endregion
 
@@ -60,7 +85,7 @@ namespace TestTaskWpfApp
         {
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri); //
                 request.ClientCertificates.Add(certificate);
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 using (Stream stream = response.GetResponseStream())
@@ -69,13 +94,16 @@ namespace TestTaskWpfApp
                     {
                         XmlDocument xmlDoc = new XmlDocument();
                         xmlDoc.Load(reader);
+                        logger.Info($"RequestToServer: Получили XML ответ от сервера по запросу {requestUri}");
                         return xmlDoc;
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message);
+                result = $"RequestToServer: {ex.Message}";
+                logger.Error(result);
+                resultColor = Brushes.Red;
                 return null;
             }
         }
@@ -101,7 +129,7 @@ namespace TestTaskWpfApp
 
                 int i = 0;
                 int n = xRoot.ChildNodes.Count; //количество узлов в корневом элементе
-                int m = Data.xmlAttributes.Length;
+                int m = Data.xmlAttributes.Length; //количество атрибутов в одном узле
                 Data.value = new string[n, m];
                 // обход всех узлов в корневом элементе
                 foreach (XmlNode xnode in xRoot)
@@ -118,13 +146,15 @@ namespace TestTaskWpfApp
                     }
                     i++;
                 }
+                logger.Info($"ParseXml: XML ответ [{Data.name}] успешно спарсили");
                 return Data;
             }
             catch(Exception ex)
             {
-                logger.Error(ex.Message);
+                result = $"ParseXml: {ex.Message}";
+                logger.Error(result);
+                resultColor = Brushes.Red;
                 return null;
-                
             }
         }
         public void WriteToDatabase(string SqlServer, string Database, DataXmlSql Data)
@@ -151,13 +181,29 @@ namespace TestTaskWpfApp
                     SqlCommand command = new SqlCommand(commandText, connection);
                     int number = command.ExecuteNonQuery();
                 }
-                
-                logger.Info($"{Data.name} успешно записан в БД");
+
+                result = $"WriteToDatabase: [{Data.name}] успешно записан в БД";
+                logger.Info(result);
+                resultColor = Brushes.Green;
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message);
+                result = $"WriteToDatabase: {ex.Message}";
+                resultColor = Brushes.Red;
+                logger.Error(result);
             }
+        }
+        public DataView GetDataFromDatabase (string SqlServer, string Database, string TableName)
+        {
+            string sql = $"SELECT * FROM {TableName}";
+            DataTable Table = new DataTable();
+            string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True";
+            SqlConnection connection = new SqlConnection(connectionString);
+            SqlCommand command = new SqlCommand(sql, connection);
+            SqlDataAdapter adapter = new SqlDataAdapter(command);
+            connection.Open();
+            adapter.Fill(Table);
+            return Table.DefaultView;
         }
     }
 }

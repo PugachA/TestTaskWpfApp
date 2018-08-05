@@ -17,6 +17,8 @@ using NLog;
 using System.Threading;
 using System.Net;
 using System.Xml;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace TestTaskWpfApp
 {
@@ -37,23 +39,13 @@ namespace TestTaskWpfApp
 
         private void GetCercificate_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                DataManager dataManager = new DataManager();
-                logger.Info($"Пользователь нажал кнопку [{GetCercificate.Content}]");
-                certificate = dataManager.GetCertificate("490000071cca86ffb77b3d794700020000071c");
-                string CertInfo=dataManager.GetCertificateInfo(certificate);
-                _richTextBox.Document.Blocks.Clear();
-                _richTextBox.AppendText(CertInfo);
-                _textBlock.Foreground = Brushes.Green;
-                _textBlock.Text = "Сертификат успешно найден";
-            }
-            catch (Exception ex)
-            {
-                _textBlock.Foreground = Brushes.Red;
-                _textBlock.Text = "Ошибка: " + ex.Message;
-                logger.Error(ex.Message);
-            }
+            DataManager dataManager = new DataManager();
+            logger.Info($"Пользователь нажал кнопку [{GetCercificate.Content}]");
+            certificate = dataManager.GetCertificate(Properties.Settings.Default.CertSerialNumber);
+            if (certificate != null)
+                GetCercificate.IsEnabled = false;
+            _textBlock.Text = dataManager.result;
+            _textBlock.Foreground = dataManager.resultColor;
         }
 
         private void GetErrorCodes_Click(object sender, RoutedEventArgs e)
@@ -100,24 +92,24 @@ namespace TestTaskWpfApp
             try
             {
                 DataManager dataManager = new DataManager();
-                XmlDocument xmlDoc = dataManager.RequestToServer(certificate, "https://mkassa.byro.ru/payment2/?CmdId=get_errorscode");
-                DataXmlSql Data = dataManager.ParseXml(xmlDoc, "ErrorCodes");
-                if (Data != null)
+                XmlDocument xmlDoc = dataManager.RequestToServer(certificate, Properties.Settings.Default.ErrorCodesUri);
+                if (xmlDoc != null)
                 {
-                    Dispatcher.BeginInvoke((Action)(delegate { _richTextBox.Document.Blocks.Clear(); }));
-                    Dispatcher.BeginInvoke((Action)(delegate { _richTextBox.AppendText(Data.GetInfo()); }));
+                    DataXmlSql Data = dataManager.ParseXml(xmlDoc, "ErrorCodes");
+                    if (Data != null)
+                    {
+                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
+                        Dispatcher.BeginInvoke((Action)(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); }));
+                    }
                 }
-                else throw new Exception("Ошибка смотри логи");
-                dataManager.WriteToDatabase("SQLEXPRESS", "InfoDirectory", Data);
-
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = Brushes.Green; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = $"{Data.name} успешно получен и записан в БД"; }));
+                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = dataManager.resultColor; }));
+                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = dataManager.result; }));
             }
             catch (Exception ex)
             {
                 Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = Brushes.Red; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = ex.Message; }));
-                logger.Error(ex.Message);
+                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = $"ProcessingErrorCodes: {ex.Message}"; }));
+                logger.Error($"ProcessingErrorCodes: {ex.Message}");
             }
         }
 
@@ -126,24 +118,24 @@ namespace TestTaskWpfApp
             try
             {
                 DataManager dataManager = new DataManager();
-                XmlDocument xmlDoc = dataManager.RequestToServer(certificate, "https://mkassa.byro.ru/payment2/?CmdId=GET_CATEGORIES");
-                DataXmlSql Data = dataManager.ParseXml(xmlDoc, "Categories");
-                if (Data != null)
+                XmlDocument xmlDoc = dataManager.RequestToServer(certificate, Properties.Settings.Default.CategoriesUri);
+                if (xmlDoc != null)
                 {
-                    Dispatcher.BeginInvoke((Action)(delegate { _richTextBox.Document.Blocks.Clear(); }));
-                    Dispatcher.BeginInvoke((Action)(delegate { _richTextBox.AppendText(Data.GetInfo()); }));
+                    DataXmlSql Data = dataManager.ParseXml(xmlDoc, "Categories");
+                    if (Data != null)
+                    {
+                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
+                        Dispatcher.BeginInvoke((Action)(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); }));
+                    }
                 }
-                else throw new Exception("Ошибка смотри логи");
-                dataManager.WriteToDatabase("SQLEXPRESS", "InfoDirectory", Data);
-
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = Brushes.Green; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = $"{Data.name} успешно получен и записан в БД"; }));
+                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = dataManager.resultColor; }));
+                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = dataManager.result; }));
             }
             catch (Exception ex)
             {
                 Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = Brushes.Red; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = ex.Message; }));
-                logger.Error(ex.Message);
+                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = $"ProcessingCategories: {ex.Message}"; }));
+                logger.Error($"ProcessingCategories: {ex.Message}");
             }
         }
     }
