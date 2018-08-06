@@ -8,16 +8,21 @@ namespace TestTaskWpfApp
 {
     class DataXmlSql
     {
-        public string[] xmlAttributes;
-        public string[,] value;
-        public string sqlStoredProcedure;
-        public string[] parametersStoredProcedure;
-        public string TableType;
-        public string name;
-        public string TableName;
-        public string TableTypeValues;
+        /// <summary>
+        /// Класс для хранения разобранного XML ответа сервера, 
+        /// настройки работы с данными XML и записи их в БД,
+        /// содержит вспомогательгые переменные
+        /// </summary>
+        
+        public string[] xmlAttributes; //атрибуты XML узла
+        public string[,] value; //двумерный массив для хранения данных XML ответа
+        public string sqlStoredProcedure; //название хранимой процедуры для  записи в БД
+        public string TableType; //название табличного типа
+        public string name; //название списка
+        public string TableName; //название таблицы в БД
+        public string TableTypeValues;//название столбцов в табличном типе
 
-        public void ErrorCodesValues()
+        public void ErrorCodesValues() //заполняет все поля для ErrorCodes
         {
             name = "Список ошибок";
             xmlAttributes = new string[2];
@@ -28,12 +33,9 @@ namespace TestTaskWpfApp
             TableType = "ErrorCodeTableType";
             TableName = "ErrorCode";
             TableTypeValues = "code, [text]";
-            parametersStoredProcedure = new string[2];
-            parametersStoredProcedure[0] = "@code";
-            parametersStoredProcedure[1] = "@text";
         }
 
-        public void CategoriesValues()
+        public void CategoriesValues() //заполняет все поля для Categories
         {
             name = "Список категорий";
             xmlAttributes = new string[4];
@@ -46,14 +48,9 @@ namespace TestTaskWpfApp
             TableType = "CategoryTableType";
             TableName = "Category";
             TableTypeValues = "id, [name], parent, [image]";
-            parametersStoredProcedure = new string[4];
-            parametersStoredProcedure[0] = "@id";
-            parametersStoredProcedure[1] = "@name";
-            parametersStoredProcedure[2] = "@parent";
-            parametersStoredProcedure[3] = "@image";
         }
 
-        public string GetInfo()
+        public string GetInfo() //информация о содержимом в переменной value
         {
             string str = "";
 

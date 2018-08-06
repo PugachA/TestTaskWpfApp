@@ -17,9 +17,9 @@ namespace TestTaskWpfApp
 {
     class DataManager
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        public string result;
-        public SolidColorBrush resultColor;
+        private static Logger logger = LogManager.GetCurrentClassLogger(); //объявляем обьект класса LOgger для записи логов
+        public string result; //здесь будет храниться вся информация об ошибках и результатах выполнения методов
+        public SolidColorBrush resultColor; //здесь будет храниться цвет результата
 
         #region Certificate
         public X509Certificate2 GetCertificate(string serialNumber) //получение сертификата
@@ -81,19 +81,19 @@ namespace TestTaskWpfApp
         }
         #endregion
 
-        public XmlDocument RequestToServer(X509Certificate2 certificate, string requestUri)
+        public XmlDocument RequestToServer(X509Certificate2 certificate, string requestUri) //отправляет запрос и получает XML ответ
         {
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri); //
-                request.ClientCertificates.Add(certificate);
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                using (Stream stream = response.GetResponseStream())
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri); //отправляем запрос
+                request.ClientCertificates.Add(certificate); //прикрепляем сертификат
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse(); //получаем ответ
+                using (Stream stream = response.GetResponseStream()) //получаем поток ответа
                 {
-                    using (XmlTextReader reader = new XmlTextReader(stream))
+                    using (XmlTextReader reader = new XmlTextReader(stream)) //поток ответа в формате XML
                     {
-                        XmlDocument xmlDoc = new XmlDocument();
-                        xmlDoc.Load(reader);
+                        XmlDocument xmlDoc = new XmlDocument();//создаем XML документ
+                        xmlDoc.Load(reader);// записываем поток в XML документ
                         logger.Info($"RequestToServer: Получили XML ответ от сервера по запросу {requestUri}");
                         return xmlDoc;
                     }
@@ -107,39 +107,38 @@ namespace TestTaskWpfApp
                 return null;
             }
         }
-        public DataXmlSql ParseXml(XmlDocument xmlDoc, string formatXml)
+        public DataXmlSql ParseXml(XmlDocument xmlDoc, string formatXml) //парсим XML ответ и записываем в класс
         {
             try
             {
                 // получим корневой элемент
                 XmlElement xRoot = xmlDoc.DocumentElement;
 
-                //int n = xRoot.Attributes.Count; //получаем количество узлов
-                DataXmlSql Data = new DataXmlSql();
+                DataXmlSql Data = new DataXmlSql(); //обьект класса, в котором будет храниться информация XML ответа
 
-                if (formatXml == "ErrorCodes")
+                if (formatXml == "ErrorCodes") //Если парсим ErrorCodes
                 {
-                    Data.ErrorCodesValues();
+                    Data.ErrorCodesValues(); //выставляем все необходимые настройки и задаёт вспомогательные переменные для разбора Errorcodes
                 }
-                else if (formatXml == "Categories")
+                else if (formatXml == "Categories") //Если парсим Categories
                 {
-                    Data.CategoriesValues();
+                    Data.CategoriesValues();//выставляем все необходимые настройки и задаёт вспомогательные переменные для разбора Categories
                 }
                 else throw new Exception("Передан неверный формата разбора XML");
 
-                int i = 0;
+                int i = 0; //счетчик в цикле
                 int n = xRoot.ChildNodes.Count; //количество узлов в корневом элементе
                 int m = Data.xmlAttributes.Length; //количество атрибутов в одном узле
-                Data.value = new string[n, m];
+                Data.value = new string[n, m]; // задеём размерность двумерного массива
                 // обход всех узлов в корневом элементе
                 foreach (XmlNode xnode in xRoot)
                 {
-                    if (xnode.Attributes.Count > 0)
+                    if (xnode.Attributes.Count > 0) // если есть атрибуты в узле
                     {
-                        for (int j = 0; j < m; j++)
+                        for (int j = 0; j < m; j++) // пройдёмся по всем атрибутам
                         {
-                            XmlNode attribute = xnode.Attributes.GetNamedItem(Data.xmlAttributes[j]);
-                            // получаем атрибут
+                            XmlNode attribute = xnode.Attributes.GetNamedItem(Data.xmlAttributes[j]); // получаем атрибут
+                            // получаем значение атрибута
                             if (attribute != null)
                                 Data.value[i, j] = attribute.Value;
                         }
@@ -157,29 +156,35 @@ namespace TestTaskWpfApp
                 return null;
             }
         }
-        public void WriteToDatabase(string SqlServer, string Database, DataXmlSql Data)
+
+        #region Database
+        public void WriteToDatabase(string SqlServer, string Database, DataXmlSql Data) //записываем из класса в БД
         {
             try
             {
-                string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True"; //подключаемся к базе
+                string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True"; // строка подключения к базе
 
-                string commandText = $"DECLARE @table AS {Data.TableType};";
+                string commandText = $"DECLARE @table AS {Data.TableType};"; //текстовая команда объявления переменной табличного типа
 
-                for (int i = 0; i < Data.value.GetUpperBound(0) + 1; i++)
+                for (int i = 0; i < Data.value.GetUpperBound(0) + 1; i++) //пройдёмся по всем строкам массива в классе
                 {
-                    commandText = String.Concat(commandText, $"INSERT INTO @table ({Data.TableTypeValues}) Values  ({Data.value[i,0]}");
+                    //создадим скрипт для записи значений переменную табличного типа
+                    commandText = String.Concat(commandText, $"INSERT INTO @table ({Data.TableTypeValues}) Values  ({Data.value[i,0]}");  //добавляем команду и первый элемент строки
                     for (int j = 1; j < Data.value.GetUpperBound(1) + 1; j++)
                     {
-                        commandText = String.Concat(commandText, $",'{Data.value[i,j]}'");
+                        commandText = String.Concat(commandText, $",'{Data.value[i,j]}'"); //добавляем остальные элементы строки
                     }
-                    commandText = String.Concat(commandText, ");");
+                    commandText = String.Concat(commandText, ");"); //закрываем скобки
                 }
+
+                commandText = String.Concat(commandText, $"Exec {Data.sqlStoredProcedure} @table");//команда для записи данных в БД через хранимую процедуру
+
+                //подключаемся к БД
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    connection.Open();
-                    commandText = String.Concat(commandText,$"Exec {Data.sqlStoredProcedure} @table");
-                    SqlCommand command = new SqlCommand(commandText, connection);
-                    int number = command.ExecuteNonQuery();
+                    connection.Open();//открываем соединение
+                    SqlCommand command = new SqlCommand(commandText, connection); //создаем скрипт
+                    int number = command.ExecuteNonQuery(); //выполняем скрпит
                 }
 
                 result = $"WriteToDatabase: [{Data.name}] успешно записан в БД";
@@ -193,17 +198,20 @@ namespace TestTaskWpfApp
                 logger.Error(result);
             }
         }
-        public DataView GetDataFromDatabase (string SqlServer, string Database, string TableName)
+        public DataView GetDataFromDatabase (string SqlServer, string Database, string TableName) //возвращает таблицы из БД для записи в DataGrid
         {
-            string sql = $"SELECT * FROM {TableName}";
-            DataTable Table = new DataTable();
-            string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True";
-            SqlConnection connection = new SqlConnection(connectionString);
-            SqlCommand command = new SqlCommand(sql, connection);
-            SqlDataAdapter adapter = new SqlDataAdapter(command);
-            connection.Open();
-            adapter.Fill(Table);
-            return Table.DefaultView;
+            string sql = $"SELECT * FROM {TableName}"; //выбираем данные из таблицы
+            
+            string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True"; //строка подключения
+            SqlConnection connection = new SqlConnection(connectionString); //подключаемся к БД
+            SqlCommand command = new SqlCommand(sql, connection);//команда SELECT 
+            SqlDataAdapter adapter = new SqlDataAdapter(command); //создадим обьект SqlDataAdapter для заполнения DataTable
+            DataTable Table = new DataTable(); //создаём таблицу
+
+            connection.Open(); //открываем подключение
+            adapter.Fill(Table); //заполняем таблицу
+            return Table.DefaultView; //представление таблицы, которое можно записать в DataGrid
         }
+        #endregion
     }
 }
