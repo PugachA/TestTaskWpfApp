@@ -12,10 +12,11 @@ ON Source.code=Target.code
 WHEN MATCHED THEN UPDATE SET Target.[text]=Source.[text]
 
 WHEN NOT MATCHED THEN
-INSERT (code,[text]) VALUES (Source.code,Source.[text]);
+INSERT (code,[text]) VALUES (Source.code,Source.[text])
 
---удаляем значения, если список пришел короче
-DELETE ErrorCode WHERE code NOT IN (SELECT code FROM @table);
+WHEN NOT MATCHED BY Source THEN
+DELETE;
+
 GO
 
 CREATE PROCEDURE sp_AddCategories
@@ -30,8 +31,9 @@ WHEN MATCHED THEN
  UPDATE SET Target.[name]=Source.[name], Target.parent=Source.parent, Target.[image]=Source.[image]
 
 WHEN NOT MATCHED THEN
-INSERT (id,[name],parent,[image]) VALUES (Source.id,Source.[name],Source.parent,Source.[image]);
+INSERT (id,[name],parent,[image]) VALUES (Source.id,Source.[name],Source.parent,Source.[image])
 
---удаляем значения, если список пришел короче
-DELETE Category WHERE id NOT IN (SELECT id FROM @table);
+WHEN NOT MATCHED BY Source THEN
+DELETE;
+
 GO
