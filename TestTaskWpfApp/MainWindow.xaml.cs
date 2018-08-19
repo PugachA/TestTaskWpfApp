@@ -99,16 +99,16 @@ namespace TestTaskWpfApp
                     if (Data != null)
                     {
                         dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
-                        Dispatcher.BeginInvoke((Action)(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); }));
+                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); });
                     }
                 }
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = dataManager.resultColor; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = dataManager.result; }));
+                Dispatcher.Invoke(delegate { _textBlock.Foreground = dataManager.resultColor; });
+                Dispatcher.Invoke(delegate { _textBlock.Text = dataManager.result; });
             }
             catch (Exception ex)
             {
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = Brushes.Red; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = $"ProcessingErrorCodes: {ex.Message}"; }));
+                Dispatcher.Invoke(delegate { _textBlock.Foreground = Brushes.Red; });
+                Dispatcher.Invoke(delegate { _textBlock.Text = $"ProcessingErrorCodes: {ex.Message}"; });
                 logger.Error($"ProcessingErrorCodes: {ex.Message}");
             }
         }
@@ -125,16 +125,16 @@ namespace TestTaskWpfApp
                     if (Data != null)
                     {
                         dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
-                        Dispatcher.BeginInvoke((Action)(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); }));
+                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); });
                     }
                 }
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = dataManager.resultColor; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = dataManager.result; }));
+                Dispatcher.Invoke(delegate { _textBlock.Foreground = dataManager.resultColor; });
+                Dispatcher.Invoke(delegate { _textBlock.Text = dataManager.result; });
             }
             catch (Exception ex)
             {
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Foreground = Brushes.Red; }));
-                Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = $"ProcessingCategories: {ex.Message}"; }));
+                Dispatcher.Invoke(delegate { _textBlock.Foreground = Brushes.Red; });
+                Dispatcher.Invoke(delegate { _textBlock.Text = $"ProcessingCategories: {ex.Message}"; });
                 logger.Error($"ProcessingCategories: {ex.Message}");
             }
         }
