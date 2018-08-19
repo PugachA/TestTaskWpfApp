@@ -60,6 +60,7 @@ namespace TestTaskWpfApp
 
         public string GetCertificateInfo(X509Certificate2 certificate) //метод для получения информации о найденном сертификате
         {
+
             if (certificate != null)
             {
                 byte[] rawdata = certificate.RawData;
@@ -111,9 +112,6 @@ namespace TestTaskWpfApp
         {
             try
             {
-                // получим корневой элемент
-                XmlElement xRoot = xmlDoc.DocumentElement;
-
                 DataXmlSql Data = new DataXmlSql(); //обьект класса, в котором будет храниться информация XML ответа
 
                 if (formatXml == "ErrorCodes") //Если парсим ErrorCodes
@@ -126,6 +124,8 @@ namespace TestTaskWpfApp
                 }
                 else throw new Exception("Передан неверный формата разбора XML");
 
+                // получим корневой элемент
+                XmlElement xRoot = xmlDoc.DocumentElement;
                 int i = 0; //счетчик в цикле
                 int n = xRoot.ChildNodes.Count; //количество узлов в корневом элементе
                 int m = Data.xmlAttributes.Length; //количество атрибутов в одном узле
@@ -179,12 +179,12 @@ namespace TestTaskWpfApp
 
                 commandText = String.Concat(commandText, $"Exec {Data.sqlStoredProcedure} @table");//команда для записи данных в БД через хранимую процедуру
 
-                //подключаемся к БД
+                //подключаемся к БД  
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();//открываем соединение
                     SqlCommand command = new SqlCommand(commandText, connection); //создаем скрипт
-                    int number = command.ExecuteNonQuery(); //выполняем скрпит
+                    int number = command.ExecuteNonQuery(); //выполняем скрипт
                 }
 
                 result = $"WriteToDatabase: [{Data.name}] успешно записан в БД";

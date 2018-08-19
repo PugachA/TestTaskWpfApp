@@ -16,17 +16,13 @@
             <Button x:Name="GetCercificate" Content="Проверить сертификат" Height="30" Width="200" Canvas.Top="20" Canvas.Left="40" Click="GetCercificate_Click"/>
             <Button x:Name="GetErrorCodes" Content="Список ошибок" Height="30" Width="200" Canvas.Top="55" Canvas.Left="40" Click="GetErrorCodes_Click"/>
             <Button x:Name="GetCategories" Content="Список категорий" Height="30" Width="200" Canvas.Top="90" Canvas.Left="40" Click="GetCategories_Click"/>
-            <TextBlock x:Name="_textBlock" Text="Перед тем как запросить список нужно проверить сертификат"
+            <TextBlock x:Name="_textBlock" Text="Перед тем как запросить список, нужно проверить сертификат"
                        Canvas.Top="20"
                        Canvas.Left="300"
                        Height="100"
                        Width="250"
                        TextWrapping="Wrap"/>
         </Canvas>
-
-        <!--<ScrollViewer Grid.Row="1">
-            <RichTextBox x:Name="_richTextBox"/>
-        </ScrollViewer>-->
 
         <DataGrid x:Name="_dataGrid" Grid.Row="1" AutoGenerateColumns="True" IsReadOnly="True"/>
 
