@@ -137,7 +137,6 @@ namespace TestTaskWpfApp
                 Dispatcher.BeginInvoke((Action)(delegate { _textBlock.Text = $"ProcessingCategories: {ex.Message}"; }));
                 logger.Error($"ProcessingCategories: {ex.Message}");
                 DataManager dat = new DataManager();
-                dat.
             }
         }
     }
