@@ -195,17 +195,30 @@ namespace TestTaskWpfApp
         }
         public DataView GetDataFromDatabase (string SqlServer, string Database, string TableName) //возвращает таблицы из БД для записи в DataGrid
         {
-            string sql = $"SELECT * FROM {TableName}"; //выбираем данные из таблицы
-            
-            string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True"; //строка подключения
-            SqlConnection connection = new SqlConnection(connectionString); //подключаемся к БД
-            SqlCommand command = new SqlCommand(sql, connection);//команда SELECT 
-            SqlDataAdapter adapter = new SqlDataAdapter(command); //создадим обьект SqlDataAdapter для заполнения DataTable
-            DataTable Table = new DataTable(); //создаём таблицу
+            try
+            {
+                string sql = $"SELECT * FROM {TableName}"; //выбираем данные из таблицы
 
-            connection.Open(); //открываем подключение
-            adapter.Fill(Table); //заполняем таблицу
-            return Table.DefaultView; //представление таблицы, которое можно записать в DataGrid
+                string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True"; //строка подключения
+                using (SqlConnection connection = new SqlConnection(connectionString)) //подключаемся к БД
+                {
+                    SqlCommand command = new SqlCommand(sql, connection);//команда SELECT 
+                    SqlDataAdapter adapter = new SqlDataAdapter(command); //создадим обьект SqlDataAdapter для заполнения DataTable
+                    DataTable Table = new DataTable(); //создаём таблицу
+
+                    connection.Open(); //открываем подключение
+                    adapter.Fill(Table); //заполняем таблицу
+                    logger.Info("WriteToDatabase: Успех");
+                    return Table.DefaultView; //представление таблицы, которое можно записать в DataGrid
+                }
+            }
+            catch (Exception ex)
+            {
+                result = $"WriteToDatabase: {ex.Message}";
+                resultColor = Brushes.Red;
+                logger.Error(result);
+                return null;
+            }
         }
         #endregion
     }
