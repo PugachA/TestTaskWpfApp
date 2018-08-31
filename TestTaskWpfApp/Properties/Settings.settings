@@ -14,5 +14,8 @@
     <Setting Name="SqlServer" Type="System.String" Scope="User">
       <Value Profile="(Default)">SQLEXPRESS</Value>
     </Setting>
+    <Setting Name="Database" Type="System.String" Scope="User">
+      <Value Profile="(Default)">InfoDirectory</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

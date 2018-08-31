@@ -84,8 +84,8 @@ namespace TestTaskWpfApp
                     DataXmlSql Data = dataManager.ParseXml(xmlDoc, "ErrorCodes");
                     if (Data != null)
                     {
-                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
-                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); });
+                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data);
+                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data.TableName); });
                     }
                 }
                 Dispatcher.Invoke(delegate { _textBlock.Foreground = dataManager.resultColor; });
@@ -110,8 +110,8 @@ namespace TestTaskWpfApp
                     DataXmlSql Data = dataManager.ParseXml(xmlDoc, "Categories");
                     if (Data != null)
                     {
-                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
-                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); });
+                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data);
+                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data.TableName); });
                     }
                 }
                 Dispatcher.Invoke(delegate { _textBlock.Foreground = dataManager.resultColor; });
