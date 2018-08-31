@@ -110,15 +110,17 @@ namespace TestTaskWpfApp
             {
                 DataXmlSql Data = new DataXmlSql(); //обьект класса, в котором будет храниться информация XML ответа
 
-                if (formatXml == "ErrorCodes") //Если парсим ErrorCodes
+                switch (formatXml)
                 {
-                    Data.ErrorCodesValues(); //выставляем все необходимые настройки и задаёт вспомогательные переменные для разбора Errorcodes
+                    case "ErrorCodes": //Если парсим ErrorCode
+                        Data.ErrorCodesValues(); //выставляем все необходимые настройки и задаёт вспомогательные переменные для разбора Errorcodes
+                        break;
+                    case "Categories": //Если парсим Categories
+                        Data.CategoriesValues();//выставляем все необходимые настройки и задаёт вспомогательные переменные для разбора Categories
+                        break;
+                    default:
+                        throw new Exception("Передан неверный формата разбора XML");
                 }
-                else if (formatXml == "Categories") //Если парсим Categories
-                {
-                    Data.CategoriesValues();//выставляем все необходимые настройки и задаёт вспомогательные переменные для разбора Categories
-                }
-                else throw new Exception("Передан неверный формата разбора XML");
 
                 // получим корневой элемент
                 XmlElement xRoot = xmlDoc.DocumentElement;
@@ -229,7 +231,7 @@ namespace TestTaskWpfApp
 
                     connection.Open(); //открываем подключение
                     adapter.Fill(Table); //заполняем таблицу
-                    logger.Info("WriteToDatabase: Успех");
+                    logger.Info("GetDataFromDatabase: Успех");
                     return Table.DefaultView; //представление таблицы, которое можно записать в DataGrid
                 }
             }
