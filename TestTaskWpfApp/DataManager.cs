@@ -91,6 +91,7 @@ namespace TestTaskWpfApp
                         XmlDocument xmlDoc = new XmlDocument();//создаем XML документ
                         xmlDoc.Load(reader);// записываем поток в XML документ
                         logger.Info($"RequestToServer: Получили XML ответ от сервера по запросу {requestUri}");
+                        logger.Info(XmlToLog(xmlDoc));
                         return xmlDoc;
                     }
                 }
@@ -148,6 +149,26 @@ namespace TestTaskWpfApp
                 result = $"ParseXml: {ex.Message}";
                 logger.Error(result);
                 resultColor = Brushes.Red;
+                return null;
+            }
+        }
+        private string XmlToLog(XmlDocument xmlDoc) //метод для записи Xml в лог
+        {
+            string result = "";
+            StringWriter stringWriter = new StringWriter(); //создаем объект записи Xml и для создания объекта XmlTextWriter
+            try
+            {
+                XmlTextWriter xmlTextWriter = new XmlTextWriter(stringWriter); // создаем для форматирования xml-документа
+                xmlTextWriter.Formatting = Formatting.Indented; //дочерние элементы разделяются отступами
+                xmlDoc.WriteContentTo(xmlTextWriter);
+                //xmlTextWriter.Flush(); //записывает в базовый поток данные из буфера
+                result = stringWriter.ToString();
+                xmlTextWriter.Close();
+                return result;
+            }
+            catch(Exception ex)
+            {
+                logger.Error($"XmlToLog: {ex.Message}");
                 return null;
             }
         }
