@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Media;
 using System.Xml;
 using NLog;
+using System.Text;
 
 namespace TestTaskWpfApp
 {
@@ -59,18 +60,17 @@ namespace TestTaskWpfApp
             if (certificate != null)
             {
                 byte[] rawdata = certificate.RawData;
-                string Info = "";
+                StringBuilder certInfo = new StringBuilder("Информация о найденном сертификате:\n");
 
-                Info = String.Concat(Info, "Информация о найденном сертификате:\n");
-                Info = String.Concat(Info, $"Content Type: {X509Certificate2.GetCertContentType(rawdata)}\n");
-                Info = String.Concat(Info, $"Friendly Name: {certificate.FriendlyName}\n");
-                Info = String.Concat(Info, $"Simple Name: {certificate.GetNameInfo(X509NameType.SimpleName, true)}\n");
-                Info = String.Concat(Info, $"Signature Algorithm: {certificate.SignatureAlgorithm.FriendlyName}\n");
-                Info = String.Concat(Info, $"Serial Number: {certificate.SerialNumber}\n");
-                Info = String.Concat(Info, $"Thumbprint: {certificate.Thumbprint}\n");
+                certInfo.Append($"Content Type: {X509Certificate2.GetCertContentType(rawdata)}\n");
+                certInfo.Append($"Friendly Name: {certificate.FriendlyName}\n");
+                certInfo.Append($"Simple Name: {certificate.GetNameInfo(X509NameType.SimpleName, true)}\n");
+                certInfo.Append($"Signature Algorithm: {certificate.SignatureAlgorithm.FriendlyName}\n");
+                certInfo.Append($"Serial Number: {certificate.SerialNumber}\n");
+                certInfo.Append($"Thumbprint: {certificate.Thumbprint}\n");
 
-                logger.Info(Info);
-                return Info;
+                logger.Info(certInfo.ToString());
+                return certInfo.ToString();
                 
             }
             else return null;
@@ -124,10 +124,7 @@ namespace TestTaskWpfApp
 
                 // получим корневой элемент
                 XmlElement xRoot = xmlDoc.DocumentElement;
-                int i = 0; //счетчик в цикле
-                int n = xRoot.ChildNodes.Count; //количество узлов в корневом элементе
                 int m = Data.xmlAttributes.Length; //количество атрибутов в одном узле
-                Data.value = new string[n, m]; // задеём размерность двумерного массива
                 // обход всех узлов в корневом элементе
                 foreach (XmlNode xnode in xRoot)
                 {
@@ -139,14 +136,10 @@ namespace TestTaskWpfApp
                             XmlNode attribute = xnode.Attributes.GetNamedItem(Data.xmlAttributes[j]); // получаем атрибут
                             // получаем значение атрибута
                             if (attribute != null)
-                            {
-                                //Data.value[i, j] = attribute.Value;
                                 row[Data.xmlAttributes[j]] = attribute.Value;
-                            }
                         }
                         Data.table.Rows.Add(row);
                     }
-                    i++;
                 }
                 logger.Info($"ParseXml: XML ответ [{Data.name}] успешно спарсили");
                 return Data;
