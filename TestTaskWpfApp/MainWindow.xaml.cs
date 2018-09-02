@@ -39,6 +39,10 @@ namespace TestTaskWpfApp
             try
             {
                 logger.Info($"Пользователь нажал кнопку [{GetErrorCodes.Content}]");
+
+                if (certificate == null)
+                    throw new Exception("Перед тем как запросить список, нужно проверить  сертификат");
+
                 // создаем новый поток
                 Thread myThread = new Thread(new ThreadStart(ProcessingErrorCodes));
                 myThread.Start(); // запускаем поток
@@ -47,6 +51,7 @@ namespace TestTaskWpfApp
             {
                 logger.Error(ex.Message);
                 _textBlock.Text = ex.Message;
+                _textBlock.Foreground = Brushes.Red;
             }
 
         }
@@ -56,6 +61,10 @@ namespace TestTaskWpfApp
             try
             {
                 logger.Info($"Пользователь нажал кнопку [{GetCategories.Content}]");
+
+                if (certificate == null)
+                    throw new Exception("Перед тем как запросить список, нужно проверить  сертификат");
+
                 // создаем новый поток
                 Thread myThread = new Thread(new ThreadStart(ProcessingCategories));
                 myThread.Start(); // запускаем поток
@@ -64,6 +73,7 @@ namespace TestTaskWpfApp
             {
                 logger.Error(ex.Message);
                 _textBlock.Text = ex.Message;
+                _textBlock.Foreground = Brushes.Red;
             }
         }
 

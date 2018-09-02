@@ -70,12 +70,13 @@ namespace TestTaskWpfApp
                 certInfo.Append($"Thumbprint: {certificate.Thumbprint}\n");
 
                 logger.Info(certInfo.ToString());
-                return certInfo.ToString();
-                
+                return certInfo.ToString(); 
             }
             else return null;
         }
         #endregion
+
+        #region Data
 
         public XmlDocument RequestToServer(X509Certificate2 certificate, string requestUri) //отправляет запрос и получает XML ответ
         {
@@ -172,6 +173,7 @@ namespace TestTaskWpfApp
                 return null;
             }
         }
+        #endregion
 
         #region Database
 
