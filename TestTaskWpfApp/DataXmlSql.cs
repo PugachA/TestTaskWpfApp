@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace TestTaskWpfApp
 {
@@ -17,6 +18,7 @@ namespace TestTaskWpfApp
         public string name; //название списка
         public string TableName; //название таблицы в БД
         public string TableTypeValues;//название столбцов в табличном типе
+        public DataTable table = new DataTable();
 
         public void ErrorCodesValues() //заполняет все поля для ErrorCodes
         {
@@ -29,6 +31,12 @@ namespace TestTaskWpfApp
             TableType = "ErrorCodeTableType";
             TableName = "ErrorCode";
             TableTypeValues = "code, [text]";
+
+            for (int i=0;i<xmlAttributes.Length;i++)
+            {
+                DataColumn column = new DataColumn(xmlAttributes[i]);
+                table.Columns.Add(column);
+            }
         }
 
         public void CategoriesValues() //заполняет все поля для Categories
@@ -44,6 +52,12 @@ namespace TestTaskWpfApp
             TableType = "CategoryTableType";
             TableName = "Category";
             TableTypeValues = "id, [name], parent, [image]";
+
+            for (int i = 0; i < xmlAttributes.Length; i++)
+            {
+                DataColumn column = new DataColumn(xmlAttributes[i]);
+                table.Columns.Add(column);
+            }
         }
 
         public string GetInfo() //информация о содержимом в переменной value

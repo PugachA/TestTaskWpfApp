@@ -133,13 +133,18 @@ namespace TestTaskWpfApp
                 {
                     if (xnode.Attributes.Count > 0) // если есть атрибуты в узле
                     {
+                        DataRow row=Data.table.NewRow();
                         for (int j = 0; j < m; j++) // пройдёмся по всем атрибутам
                         {
                             XmlNode attribute = xnode.Attributes.GetNamedItem(Data.xmlAttributes[j]); // получаем атрибут
                             // получаем значение атрибута
                             if (attribute != null)
-                                Data.value[i, j] = attribute.Value;
+                            {
+                                //Data.value[i, j] = attribute.Value;
+                                row[Data.xmlAttributes[j]] = attribute.Value;
+                            }
                         }
+                        Data.table.Rows.Add(row);
                     }
                     i++;
                 }
@@ -176,38 +181,33 @@ namespace TestTaskWpfApp
         }
 
         #region Database
+
         public void WriteToDatabase(string SqlServer, string Database, DataXmlSql Data) //записываем из класса в БД
         {
             try
             {
                 string connectionString = $@"Data Source=.\{SqlServer};Initial Catalog={Database};Integrated Security=True"; // строка подключения к базе
 
-                string commandText = $"DECLARE @table AS {Data.TableType};"; //текстовая команда объявления переменной табличного типа
-
-                for (int i = 0; i < Data.value.GetUpperBound(0) + 1; i++) //пройдёмся по всем строкам массива в классе
-                {
-                    //создадим скрипт для записи значений переменную табличного типа
-                    commandText = String.Concat(commandText, $"INSERT INTO @table ({Data.TableTypeValues}) Values  ({Data.value[i,0]}");  //добавляем команду и первый элемент строки
-                    for (int j = 1; j < Data.value.GetUpperBound(1) + 1; j++)
-                    {
-                        commandText = String.Concat(commandText, $",'{Data.value[i,j]}'"); //добавляем остальные элементы строки
-                    }
-                    commandText = String.Concat(commandText, ");"); //закрываем скобки
-                }
-
-                commandText = String.Concat(commandText, $"Exec {Data.sqlStoredProcedure} @table");//команда для записи данных в БД через хранимую процедуру
-
-                //подключаемся к БД  
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    connection.Open();//открываем соединение
-                    SqlCommand command = new SqlCommand(commandText, connection); //создаем скрипт
-                    int number = command.ExecuteNonQuery(); //выполняем скрипт
-                }
+                    connection.Open();
+                    SqlCommand command = new SqlCommand(Data.sqlStoredProcedure, connection);
+                    // указываем, что команда представляет хранимую процедуру
+                    command.CommandType = CommandType.StoredProcedure;
+                    // параметр для ввода имени
+                    SqlParameter tableParam = new SqlParameter
+                    {
+                        ParameterName = "@table",
+                        Value = Data.table
+                    };
+                    // добавляем параметр
+                    command.Parameters.Add(tableParam);
+                    var res = command.ExecuteNonQuery();
 
-                result = $"WriteToDatabase: [{Data.name}] успешно записан в БД";
-                logger.Info(result);
-                resultColor = Brushes.Green;
+                    result = $"WriteToDatabase: [{Data.name}] успешно записан в БД.";
+                    logger.Info(result);
+                    resultColor = Brushes.Green;
+                }
             }
             catch (Exception ex)
             {
@@ -216,6 +216,7 @@ namespace TestTaskWpfApp
                 logger.Error(result);
             }
         }
+
         public DataView GetDataFromDatabase (string SqlServer, string Database, string TableName) //возвращает таблицы из БД для записи в DataGrid
         {
             try
