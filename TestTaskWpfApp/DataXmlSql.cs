@@ -12,12 +12,9 @@ namespace TestTaskWpfApp
         /// </summary>
         
         public string[] xmlAttributes; //атрибуты XML узла
-        public string[,] value; //двумерный массив для хранения данных XML ответа
         public string sqlStoredProcedure; //название хранимой процедуры для  записи в БД
-        public string TableType; //название табличного типа
         public string name; //название списка
         public string TableName; //название таблицы в БД
-        public string TableTypeValues;//название столбцов в табличном типе
         public DataTable table = new DataTable();
 
         public void ErrorCodesValues() //заполняет все поля для ErrorCodes
@@ -28,9 +25,7 @@ namespace TestTaskWpfApp
             xmlAttributes[1] = "text";
 
             sqlStoredProcedure = "sp_AddErrorCodes";
-            TableType = "ErrorCodeTableType";
             TableName = "ErrorCode";
-            TableTypeValues = "code, [text]";
 
             for (int i=0;i<xmlAttributes.Length;i++)
             {
@@ -49,30 +44,13 @@ namespace TestTaskWpfApp
             xmlAttributes[3] = "image";
 
             sqlStoredProcedure = "sp_AddCategories";
-            TableType = "CategoryTableType";
             TableName = "Category";
-            TableTypeValues = "id, [name], parent, [image]";
 
             for (int i = 0; i < xmlAttributes.Length; i++)
             {
                 DataColumn column = new DataColumn(xmlAttributes[i]);
                 table.Columns.Add(column);
             }
-        }
-
-        public string GetInfo() //информация о содержимом в переменной value
-        {
-            string str = "";
-
-            for (int i = 0; i < value.GetUpperBound(0) + 1; i++)
-            {
-                for (int j = 0; j < value.GetUpperBound(1) + 1; j++)
-                {
-                    str = String.Concat(str, $"{value[i, j]}\t");
-                }
-                str = String.Concat(str, "\n");
-            }
-            return str;
         }
     }
 }
