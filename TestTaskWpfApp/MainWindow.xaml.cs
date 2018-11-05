@@ -40,6 +40,10 @@ namespace TestTaskWpfApp
             try
             {
                 logger.Info($"Пользователь нажал кнопку [{GetErrorCodes.Content}]");
+
+                if (certificate == null)
+                    throw new Exception("Перед тем как запросить список, нужно проверить  сертификат");
+
                 // создаем новый поток
                 Task errorCodeTask = Task.Factory.StartNew(ProcessingErrorCodes); //запускаем задачу по получению списка ошибок в отдельном потоке
             }
@@ -47,6 +51,7 @@ namespace TestTaskWpfApp
             {
                 logger.Error(ex.Message);
                 _textBlock.Text = ex.Message;
+                _textBlock.Foreground = Brushes.Red;
             }
 
         }
@@ -56,6 +61,10 @@ namespace TestTaskWpfApp
             try
             {
                 logger.Info($"Пользователь нажал кнопку [{GetCategories.Content}]");
+
+                if (certificate == null)
+                    throw new Exception("Перед тем как запросить список, нужно проверить  сертификат");
+
                 // создаем новый поток
                 Task categoriesTask = Task.Factory.StartNew(ProcessingCategories); //запускаем задачу по получению списка категорий в отдельном потоке
             }
@@ -63,6 +72,7 @@ namespace TestTaskWpfApp
             {
                 logger.Error(ex.Message);
                 _textBlock.Text = ex.Message;
+                _textBlock.Foreground = Brushes.Red;
             }
         }
 
@@ -83,8 +93,8 @@ namespace TestTaskWpfApp
                     DataXmlSql Data = dataManager.ParseXml(xmlDoc, "ErrorCodes");
                     if (Data != null)
                     {
-                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
-                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); });
+                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data);
+                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data.TableName); });
                     }
                 }
                 Dispatcher.Invoke(delegate { _textBlock.Foreground = dataManager.resultColor; });
@@ -109,8 +119,8 @@ namespace TestTaskWpfApp
                     DataXmlSql Data = dataManager.ParseXml(xmlDoc, "Categories");
                     if (Data != null)
                     {
-                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data);
-                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, "InfoDirectory", Data.TableName); });
+                        dataManager.WriteToDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data);
+                        Dispatcher.Invoke(delegate { _dataGrid.ItemsSource = dataManager.GetDataFromDatabase(Properties.Settings.Default.SqlServer, Properties.Settings.Default.Database, Data.TableName); });
                     }
                 }
                 Dispatcher.Invoke(delegate { _textBlock.Foreground = dataManager.resultColor; });
