@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using NLog;
 using System.Threading;
 using System.Xml;
+using System.Threading.Tasks;
 
 namespace TestTaskWpfApp
 {
@@ -40,8 +41,7 @@ namespace TestTaskWpfApp
             {
                 logger.Info($"Пользователь нажал кнопку [{GetErrorCodes.Content}]");
                 // создаем новый поток
-                Thread myThread = new Thread(new ThreadStart(ProcessingErrorCodes));
-                myThread.Start(); // запускаем поток
+                Task errorCodeTask = Task.Factory.StartNew(ProcessingErrorCodes); //запускаем задачу по получению списка ошибок в отдельном потоке
             }
             catch (Exception ex)
             {
@@ -57,8 +57,7 @@ namespace TestTaskWpfApp
             {
                 logger.Info($"Пользователь нажал кнопку [{GetCategories.Content}]");
                 // создаем новый поток
-                Thread myThread = new Thread(new ThreadStart(ProcessingCategories));
-                myThread.Start(); // запускаем поток
+                Task categoriesTask = Task.Factory.StartNew(ProcessingCategories); //запускаем задачу по получению списка категорий в отдельном потоке
             }
             catch (Exception ex)
             {
